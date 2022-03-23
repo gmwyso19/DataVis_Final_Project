@@ -1,0 +1,40 @@
+---
+title: "Final Project"
+author: "Grace Wysocki"
+date: "3/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("blogdown")
+```
+
+```{r}
+library(readr)
+library(tidyverse)
+library(sf)
+library(plotly)
+Drinking_Water <- read_csv("~/Desktop/Drinking_Water_Testing_Data_State_01-03-2022_0.csv")
+head(Drinking_Water)
+```
+
+```{r}
+PFOA_water <- Drinking_Water %>% filter(Contaminant == "PFOA") 
+PFOA_water
+
+#install.packages("usmap")
+library(usmap) 
+library(ggplot2) 
+
+plot_usmap(regions = "counties") + 
+  theme(panel.background=element_blank())
+
+plot_usmap(data = PFOA_water, values = "Concentration") + 
+  scale_fill_continuous(low = "white", high = "blue", name = "Concentration of Contamination", label = scales::comma) + +
+  theme(legend.position = "right")
+```
+
