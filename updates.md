@@ -9,3 +9,7 @@ I found a data set for my project but it required permission from the organizati
 ## March 23 End of Class
 
 I foumd a data set! So now I have started creating an interactive map of the U.S. for the data that I found. 
+
+## March 28 Begginging of Class
+
+In between class meetings, I worked on sorting through my rather large data set and starting to create a map of California. I realized while working that I want to use Leaflet . And I found some info about the my data set and topic.
