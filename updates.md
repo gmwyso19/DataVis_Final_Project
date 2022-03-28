@@ -13,3 +13,7 @@ I foumd a data set! So now I have started creating an interactive map of the U.S
 ## March 28 Begginging of Class
 
 In between class meetings, I worked on sorting through my rather large data set and starting to create a map of California. I realized while working that I want to use Leaflet . And I found some info about the my data set and topic.
+
+## March 28 End of Class
+
+I know it doesn't look like much progress but I have been working all class to try to figure out how to use leaflet to make the graph, as I am having trouble understanding leaflet. Hopefully by next class I will have a leaflet graph made so I can start focusing on additional graphics for my blog, and start to add my work to my blog! 
