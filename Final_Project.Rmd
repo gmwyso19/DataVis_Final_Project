@@ -5,6 +5,13 @@ date: "3/22/2022"
 output: html_document
 ---
 
+Direct information to use in my blog to talk about the data: 
+
+The Safe Drinking Water Act requires EPA to administer a surveillance program to determine the prevalence of unregulated contaminants in finished water provided by community water systems. A number of states and individual public water systems have been testing source water and finished water for PFAS, but these records are not maintained by EPA in a national repository. EPA has provided states that are regulating and/or testing PFAS with a mechanism to store/report PFAS data that is associated with state-specific PFAS regulations. As of January 2021, EPA was able to compile data for eight states that have used EPA’s reporting module (SDWIS-State). The information is retrieved on a semi-annual basis – primarily from state web pages where the information is published. This data file includes aggregated data from multiple state sampling initiatives. These initiatives vary in sampling/targeting methods (e.g., non-targeted analysis vs. targeted analysis), scope (e.g., percentage and type of public water system), detection limits, sample location, reporting limits, quantification methods, what data elements are reported, and even what data are reported (e.g., some states choosing only to report detections while other states report all test results). Because of these significant differences in how states are collecting data, the information in this file should not be compared across state boundaries.
+
+For this reason, I will be focusing on the state of California, as it had a lot of data collected.  
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -22,9 +29,18 @@ Drinking_Water <- read_csv("~/Desktop/Drinking_Water_Testing_Data_State_01-03-20
 head(Drinking_Water)
 ```
 
+Tidying the data set to specify it to only include points from California of PFOA during the year 2020.
 ```{r}
-PFOA_water <- Drinking_Water %>% filter(Contaminant == "PFOA") 
-PFOA_water
+Water_CA <- Drinking_Water %>% group_by(State) %>% filter(State =="CA")
+Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = Sample_Date, into = c("month", "day", "year"), 
+           sep = "/") 
+##view(Water_CA)
+Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>% filter(Contaminant == "PFOA")
+view(Water_CA)
+```
+
+
+```{r}
 
 #install.packages("usmap")
 library(usmap) 
@@ -33,8 +49,22 @@ library(ggplot2)
 plot_usmap(regions = "counties") + 
   theme(panel.background=element_blank())
 
-plot_usmap(data = PFOA_water, values = "Concentration") + 
-  scale_fill_continuous(low = "white", high = "blue", name = "Concentration of Contamination", label = scales::comma) + +
+plot_usmap(include = c("CA")) +
+  labs(title = "California Mapping") +
+  theme(panel.background = element_rect(color = "black"))
+
+plot_usmap(data = Water_CA, values = "Concentration", include = c("CA"), color = "blue") + 
+  scale_fill_continuous(low = "white", high = "blue", name = "PFOA Concentration", label = scales::comma) + 
+  labs(title = "California PFOA Mapping", subtitle = "Concentration of PFOA Water Contamination for California Counties in 2020") +
   theme(legend.position = "right")
+
+```
+
+What I learned I actually want to do for this project while working on it 3/27/2022:
+
+- For what I want to accomplish in this project, I need to make an interactive map through leaflet rather than ggplot2. This way I can have users hover over a specific county in California and see the concentration of PFOA for various dates over the year. 
+
+```{r}
+library(leaflet)
 ```
 
