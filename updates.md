@@ -21,3 +21,7 @@ I know it doesn't look like much progress but I have been working all class to t
 ## April 4 Beginning of Class 
 
 To be honest with you, I was not able to work on the project much this week as I have been struggling with a sinus and ear infection, but I was able to work on it for a couple hours. There I tidyed my data a bit differently so that I was able to make clearer visualizations. I ended up creating a lollipop graph and a facted scatter plot, both of which need some revisions. I also have been watching some tutorials on leaflets.
+
+## April 4 End of Class
+
+I worked on trying to make a plotly graph but kept getting and error, and then I also seperated my lollipop graph into two to make it more readable. I was also playing around with my data set to see if I should be using more that just data of California from January 2020.

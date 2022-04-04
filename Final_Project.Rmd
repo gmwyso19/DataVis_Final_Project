@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-install.packages("blogdown")
+#install.packages("blogdown")
 ```
 
 ```{r}
@@ -26,7 +26,7 @@ library(tidyverse)
 library(sf)
 library(plotly)
 Drinking_Water <- read_csv("~/Desktop/Drinking_Water_Testing_Data_State_01-03-2022_0.csv")
-head(Drinking_Water)
+view(Drinking_Water)
 ```
 
 Tidying the data set to specify it to only include points from California of PFOA during the year 2020.
@@ -59,6 +59,7 @@ plot_usmap(data = Water_CA, values = "Concentration", include = c("CA"), color =
   theme(legend.position = "right")
 
 ```
+
 
 What I learned I actually want to do for this project while working on it 3/27/2022:
 
@@ -140,16 +141,26 @@ Graph Showing Overall Concentrations Drawn in Each County During the Month of Ja
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
 Water_CA <- Water_CA %>% ungroup() %>% group_by(County) %>%
-  summarise(Concentration_Total = sum(Concentration)) %>% slice(2:22) %>% arrange(desc(Concentration_Total))
+  summarise(Concentration_Total = sum(Concentration)) %>% arrange(desc(Concentration_Total)) 
 
-ggplot(data = Water_CA, aes(x = County, y = Concentration_Total)) +
+Water_small <- Water_CA %>% slice(4:22)
+Water_large <- Water_CA %>% slice(1:3)
+#view(Water_CA)
+ggplot(data = Water_small, aes(x = County, y = Concentration_Total)) +
   geom_point() + 
   geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
   coord_flip() +
   labs(x = "County Name", 
-       y = "Number of Concentrations Drawn from each County in January 2020")
-```
+       y = "Concentrations of PFOA(NG/L) Drawn from each County in January 2020")
 
+ggplot(data = Water_large, aes(x = County, y = Concentration_Total)) +
+  geom_point() + 
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
+  coord_flip() +
+  labs(x = "County Name", 
+       y = "Concentrations of PFOA(NG/L) Drawn from each County in January 2020")
+```
+Seperated lollipop graph to make it more readable. The counties with more instances of higher concentrations of PFOA are plotted second, while the counties with less instances of lower concentrations are plotted in the first lollipop graph. 
 
 Scatterplot of Data (this needs adjusting)
 ```{r}
@@ -161,3 +172,46 @@ ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served)) +
 ```
 
 Wondering if I should use the a less tidy version of the data for this graph, maybe show all of the readings from the year 2020 rather than condensing it down to a graph.
+
+```{r}
+library(usmap)
+library(ggplot2)
+
+#view(Water_CA)
+
+Water_Plot <- Water_CA %>% separate(col = County, into = c("County", "State"), 
+           sep = ",") 
+#view(Water_Plot)
+
+plot_usmap(data = Water_Plot, values = "State", color = "Concentration_Total") + 
+  scale_fill_continuous(
+    low = "white", high = "red", name = "PFOA Concentration (2020)", label = scales::comma
+  ) + theme(legend.position = "right")
+  theme(panel.background = element_rect(color = "black", fill = "lightblue"))
+```
+
+
+```{r}
+
+#install.packages("usmap")
+library(usmap) 
+library(ggplot2) 
+
+plot_usmap(regions = "counties") + 
+  theme(panel.background=element_blank())
+
+plot_usmap(include = c("CA")) +
+  labs(title = "California Mapping") +
+  theme(panel.background = element_rect(color = "black"))
+
+plot_usmap(data = Water_CA, values = "Concentration_Total", include = c("CA"), color = "blue") + 
+  scale_fill_continuous(low = "white", high = "blue", name = "PFOA Concentration", label = scales::comma) + 
+  labs(title = "California PFOA Mapping", subtitle = "Concentration of PFOA Water Contamination for California Counties in 2020") +
+  theme(legend.position = "right")
+
+```
+"
+##Error in map_with_data(data, values = values, include = include, exclude = exclude) : 
+##data must be a data.frame containing either a `state` or `fips` column. 
+" I keep getting this error in my mappings!
+

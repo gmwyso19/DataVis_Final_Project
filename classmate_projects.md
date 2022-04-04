@@ -9,3 +9,7 @@
 ##March 28
 
 ## Charlie is currently working on creating an R package with a college hockey leagues stats data set. We talked about brainstorming if we could figure out any ways to test his packages without running through the whole package. We did not come up with anything but I suggested exploring on the internet for support.
+
+##April 4
+
+## Shame is making a shiny app that allows users to choose a certain soccer player and view their shooting stats. He is also working to make it so that the app can compare soccer players stats and creates a cool visualization map.
