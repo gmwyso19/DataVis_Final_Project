@@ -17,3 +17,7 @@ In between class meetings, I worked on sorting through my rather large data set 
 ## March 28 End of Class
 
 I know it doesn't look like much progress but I have been working all class to try to figure out how to use leaflet to make the graph, as I am having trouble understanding leaflet. Hopefully by next class I will have a leaflet graph made so I can start focusing on additional graphics for my blog, and start to add my work to my blog! 
+
+## April 4 Beginning of Class 
+
+To be honest with you, I was not able to work on the project much this week as I have been struggling with a sinus and ear infection, but I was able to work on it for a couple hours. There I tidyed my data a bit differently so that I was able to make clearer visualizations. I ended up creating a lollipop graph and a facted scatter plot, both of which need some revisions. I also have been watching some tutorials on leaflets.

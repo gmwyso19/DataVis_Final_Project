@@ -109,3 +109,55 @@ leaflet(Water_CA) %>%
     position = "bottomright")
 ```
 
+Work From 4/2 (Weekend)
+
+```{r}
+library(leaflet)
+library(sp)
+
+Drinking_Water <- read_csv("~/Desktop/Drinking_Water_Testing_Data_State_01-03-2022_0.csv")
+
+Water_CA <- Drinking_Water %>% group_by(State) %>% filter(State =="CA")
+Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = Sample_Date, into = c("month", "day", "year"), 
+           sep = "/") 
+##view(Water_CA)
+Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020, month == 1) %>% filter(Contaminant == "PFOA")
+
+Water_CA <- Water_CA %>% distinct()
+
+#view(Water_CA)
+
+Water_CA.sp <- SpatialPointsDataFrame(Water_CA[])
+m <- leaflet() %>% 
+  addTiles()
+m
+```
+
+Having trouble trying ot figure out how to map this data as specific latitude and longitudes are now given. Shoud I try to make a column of coordinates based of off county coordinates? (or I mean I probably cannot just add another column to a data set, so I may need to talk to you about that)
+
+Graph Showing Overall Concentrations Drawn in Each County During the Month of January in 2020.
+```{r}
+Water_CA$Concentration = as.numeric(Water_CA$Concentration)
+
+Water_CA <- Water_CA %>% ungroup() %>% group_by(County) %>%
+  summarise(Concentration_Total = sum(Concentration)) %>% slice(2:22) %>% arrange(desc(Concentration_Total))
+
+ggplot(data = Water_CA, aes(x = County, y = Concentration_Total)) +
+  geom_point() + 
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
+  coord_flip() +
+  labs(x = "County Name", 
+       y = "Number of Concentrations Drawn from each County in January 2020")
+```
+
+
+Scatterplot of Data (this needs adjusting)
+```{r}
+Water_rename <- Water_CA %>% rename(Population_Served = `Population Served`)
+Water_CA$Concentration = as.numeric(Water_CA$Concentration)
+
+ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served)) +
+  geom_point() + facet_wrap( ~ County)
+```
+
+Wondering if I should use the a less tidy version of the data for this graph, maybe show all of the readings from the year 2020 rather than condensing it down to a graph.
