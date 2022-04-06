@@ -13,3 +13,7 @@
 ##April 4
 
 ## Shame is making a shiny app that allows users to choose a certain soccer player and view their shooting stats. He is also working to make it so that the app can compare soccer players stats and creates a cool visualization map.
+
+## April 6
+
+## Patrick is making an interactive shiny app of Mario Cart statistics. In his app you will be able to select certain character and carts and see which combos are the best for different marios cart courses. Right now he is struggling to get the graph in his app to run, because his r studio session seems to terminate everytime he runs the app. 

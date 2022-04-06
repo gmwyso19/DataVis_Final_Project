@@ -36,7 +36,7 @@ Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = 
            sep = "/") 
 ##view(Water_CA)
 Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>% filter(Contaminant == "PFOA")
-#view(Water_CA)
+(Water_CA)
 ```
 
 
@@ -66,49 +66,8 @@ What I learned I actually want to do for this project while working on it 3/27/2
 - For what I want to accomplish in this project, I need to make an interactive map through leaflet rather than ggplot2. This way I can have users hover over a specific county in California and see the concentration of PFOA for various dates over the year. 
 
 
-Playing around with leaflet code from  https://rstudio.github.io/leaflet/choropleths.html to see if I can get it to match up with what I am trying to accomplish. I know it doesn't look like much progress but I have been working all class to try to figure out how to use leaflet to make the graph, as I am having trouble understanding leaflet. Hopefully by next class I will have a leaflet graph made so I can start focusing on additional graphics for my blog, and start to add my work to my blog! 
-```{r}
-library(leaflet)
+Playing around with leaflet code from  https://rstudio.github.io/leaflet/choropleths.html to see if I can get it to match up with what I am trying to accomplish. I know it doesn't look like much progress but I have been working all class to try to figure out how to use leaflet to make the graph, as I am having trouble understanding leaflet. Hopefully by next class I will have a leaflet graph made so I can start focusing on additional graphics for my blog, and start to add my work to my blog.
 
-map <- leaflet(Water_CA) %>%
-  setView(36.7783, 119.4179, 4) %>%
-  addTiles("MapBox", options = providerTileOptions(
-    id = "mapbox.light",
-    accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN')))
-
-map %>% addPolygons()
-
-```
-
-```{r}
-library(leaflet)
-
-leaflet(Water_CA) %>%
-  setView((36.7783, 119.4179, 4) %>%
-  addTiles("MapBox", options = providerTileOptions(
-    id = "mapbox.light",
-    accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN'))) %>%
-  addPolygons(
-    fillColor = ~pal(density),
-    weight = 2,
-    opacity = 1,
-    color = "white",
-    dashArray = "3",
-    fillOpacity = 0.7,
-    highlightOptions = highlightOptions(
-      weight = 5,
-      color = "#666",
-      dashArray = "",
-      fillOpacity = 0.7,
-      bringToFront = TRUE),
-    label = labels,
-    labelOptions = labelOptions(
-      style = list("font-weight" = "normal", padding = "3px 8px"),
-      textsize = "15px",
-      direction = "auto")) %>%
-  addLegend(pal = pal, values = ~density, opacity = 0.7, title = NULL,
-    position = "bottomright")
-```
 
 Work From 4/2 (Weekend)
 
@@ -137,17 +96,14 @@ Graph Showing Overall Concentrations Drawn in Each County During the Month of Ja
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
 
-Water_AVG <- Water_CA%>% ungroup() %>% group_by(County) %>%
-  summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total))
+Water_AVG <- Water_CA%>% ungroup() %>% group_by(County) %>% summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total))
 
-view(Water_AVG)
+#view(Water_AVG)
 
 Water_remove <- Water_AVG[-c(3), ]
 
-view(Water_remove)
-#Water_small <- Water_CA %>% slice(4:22)
-#Water_large <- Water_CA %>% slice(1:3)
-#view(Water_CA)
+#view(Water_remove)
+
 ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
   geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
@@ -159,10 +115,18 @@ ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
 Just need to figure out how to arrange them in descending order)
 
 ```{r}
+Water_parse <- Water_CA %>% rename(Population_Served = `Population Served`) %>% mutate(Population_Served = parse_number(Population_Served)) 
 
-ggplot(data = Water_rename, aes(x = County, y = Population_Served)) +
+Water_parse <- Water_parse[-c(93, 114), ]
+
+#view(Water_parse)
+
+Water_Parse <- Water_parse %>% group_by(County) %>% summarise(Population_AVG = mean(Population_Served)) %>% arrange(desc(Population_AVG))
+
+
+ggplot(data = Water_Parse, aes(x = County, y = Population_AVG)) +
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
-  geom_segment(aes(x = County, xend = County, y = 0, yend = Population_Served)) +
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Population_AVG)) +
   coord_flip() +
   labs(x = "County Name", 
        y = "Population Each County Included in California in January 2020")
@@ -173,7 +137,7 @@ Scatterplot of Data (this needs adjusting)
 ```{r}
 Water_rename <- Water_remove %>% rename(Population_Served = `Population Served`)
 
-view(Water_rename)
+view(Water_fix)
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
 ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served)) +
@@ -226,10 +190,13 @@ Lost 329 rows of population data after making the data numeric, why?
 -maps package in ggplot2
 
 ```{r}
-Water_rename$Population_Served = as.numeric(Water_rename$Population_Served)
-Water_pop <- Water_rename %>% mutate(Population_lower = Population_Served/1000)
+Water_rename$Population_Served = as.character(Water_rename$Population_Served)
 
 view(Water_rename)
+
+Water_pop <- Water_rename %>% mutate(Population_lower = Population_Served/1000)
+
+view(Water_pop)
 
 plot1 <- ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served,
                                    color = County,      

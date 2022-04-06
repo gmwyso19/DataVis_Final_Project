@@ -29,3 +29,7 @@ I worked on trying to make a plotly graph but kept getting and error, and then I
 ## April 6 Beginning of Class
 
 I worked on my additional visualization. I changed my mappings of concentration, to mappings of average concentrations because it made my visualizations make more sense and look a lot better. I also tried changing the population_served variable to a numeric which eliminated a lot of rows so I need to fix that. But all in all I made a lollipop chart, a scatterplot, and tried to make another lollipop chart of population so I could compare population with average concentration of PFOA.
+
+## April 6 End of Class
+
+Embarassingly I spent most of class today trying to fix my Population variable. I finally got it to return to a character value and used the parse_number() function to make it a numeric again, but now I am having trouble with averaging the population variable. I decided a visualization of the average population per county would be more fair because the certain counties have different recorded populations served within the county. Once this problem is solved though, my additional visualization in my blog will almost be done!
