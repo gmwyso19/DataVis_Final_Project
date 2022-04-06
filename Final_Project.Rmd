@@ -26,7 +26,7 @@ library(tidyverse)
 library(sf)
 library(plotly)
 Drinking_Water <- read_csv("~/Desktop/Drinking_Water_Testing_Data_State_01-03-2022_0.csv")
-view(Drinking_Water)
+#view(Drinking_Water)
 ```
 
 Tidying the data set to specify it to only include points from California of PFOA during the year 2020.
@@ -36,7 +36,7 @@ Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = 
            sep = "/") 
 ##view(Water_CA)
 Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>% filter(Contaminant == "PFOA")
-view(Water_CA)
+#view(Water_CA)
 ```
 
 
@@ -126,12 +126,8 @@ Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020, mo
 
 Water_CA <- Water_CA %>% distinct()
 
-#view(Water_CA)
+view(Water_CA)
 
-Water_CA.sp <- SpatialPointsDataFrame(Water_CA[])
-m <- leaflet() %>% 
-  addTiles()
-m
 ```
 
 Having trouble trying ot figure out how to map this data as specific latitude and longitudes are now given. Shoud I try to make a column of coordinates based of off county coordinates? (or I mean I probably cannot just add another column to a data set, so I may need to talk to you about that)
@@ -140,44 +136,56 @@ Graph Showing Overall Concentrations Drawn in Each County During the Month of Ja
 ```{r}
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
-Water_CA <- Water_CA %>% ungroup() %>% group_by(County) %>%
-  summarise(Concentration_Total = sum(Concentration)) %>% arrange(desc(Concentration_Total)) 
 
-Water_small <- Water_CA %>% slice(4:22)
-Water_large <- Water_CA %>% slice(1:3)
+Water_AVG <- Water_CA%>% ungroup() %>% group_by(County) %>%
+  summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total))
+
+view(Water_AVG)
+
+Water_remove <- Water_AVG[-c(3), ]
+
+view(Water_remove)
+#Water_small <- Water_CA %>% slice(4:22)
+#Water_large <- Water_CA %>% slice(1:3)
 #view(Water_CA)
-ggplot(data = Water_small, aes(x = County, y = Concentration_Total)) +
-  geom_point() + 
+ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
+  geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
   geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
   coord_flip() +
   labs(x = "County Name", 
-       y = "Concentrations of PFOA(NG/L) Drawn from each County in January 2020")
+       y = "Average Concentrations of PFOA(NG/L) Drawn from Each County in January 2020")
 
-ggplot(data = Water_large, aes(x = County, y = Concentration_Total)) +
-  geom_point() + 
-  geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
+```
+Just need to figure out how to arrange them in descending order)
+
+```{r}
+
+ggplot(data = Water_rename, aes(x = County, y = Population_Served)) +
+  geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Population_Served)) +
   coord_flip() +
   labs(x = "County Name", 
-       y = "Concentrations of PFOA(NG/L) Drawn from each County in January 2020")
+       y = "Population Each County Included in California in January 2020")
 ```
-Seperated lollipop graph to make it more readable. The counties with more instances of higher concentrations of PFOA are plotted second, while the counties with less instances of lower concentrations are plotted in the first lollipop graph. 
+
 
 Scatterplot of Data (this needs adjusting)
 ```{r}
-Water_rename <- Water_CA %>% rename(Population_Served = `Population Served`)
+Water_rename <- Water_remove %>% rename(Population_Served = `Population Served`)
+
+view(Water_rename)
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
 ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served)) +
   geom_point() + facet_wrap( ~ County)
 ```
 
-Wondering if I should use the a less tidy version of the data for this graph, maybe show all of the readings from the year 2020 rather than condensing it down to a graph.
 
 ```{r}
 library(usmap)
 library(ggplot2)
 
-#view(Water_CA)
+view(Water_CA)
 
 Water_Plot <- Water_CA %>% separate(col = County, into = c("County", "State"), 
            sep = ",") 
@@ -210,8 +218,27 @@ plot_usmap(data = Water_CA, values = "Concentration_Total", include = c("CA"), c
   theme(legend.position = "right")
 
 ```
-"
-##Error in map_with_data(data, values = values, include = include, exclude = exclude) : 
-##data must be a data.frame containing either a `state` or `fips` column. 
-" I keep getting this error in my mappings!
 
+Lost 329 rows of population data after making the data numeric, why?
+
+-scatter plot by average(hover that and it tells county name)
+-plotly
+-maps package in ggplot2
+
+```{r}
+Water_rename$Population_Served = as.numeric(Water_rename$Population_Served)
+Water_pop <- Water_rename %>% mutate(Population_lower = Population_Served/1000)
+
+view(Water_rename)
+
+plot1 <- ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served,
+                                   color = County,      
+                                   label = County)) +
+  geom_point()
+
+ggplotly(plot1, tooltip = "label")
+
+view(Water_rename)
+```
+
+Trying to make population lower and inorder

@@ -25,3 +25,7 @@ To be honest with you, I was not able to work on the project much this week as I
 ## April 4 End of Class
 
 I worked on trying to make a plotly graph but kept getting and error, and then I also seperated my lollipop graph into two to make it more readable. I was also playing around with my data set to see if I should be using more that just data of California from January 2020.
+
+## April 6 Beginning of Class
+
+I worked on my additional visualization. I changed my mappings of concentration, to mappings of average concentrations because it made my visualizations make more sense and look a lot better. I also tried changing the population_served variable to a numeric which eliminated a lot of rows so I need to fix that. But all in all I made a lollipop chart, a scatterplot, and tried to make another lollipop chart of population so I could compare population with average concentration of PFOA.
