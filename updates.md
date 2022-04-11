@@ -33,3 +33,7 @@ I worked on my additional visualization. I changed my mappings of concentration,
 ## April 6 End of Class
 
 Embarassingly I spent most of class today trying to fix my Population variable. I finally got it to return to a character value and used the parse_number() function to make it a numeric again, but now I am having trouble with averaging the population variable. I decided a visualization of the average population per county would be more fair because the certain counties have different recorded populations served within the county. Once this problem is solved though, my additional visualization in my blog will almost be done!
+
+## April 11 Beginning of Class
+
+Over the weekend I was finally able to figure out how to order the bars in my lollipop graph. I am still having trouble trying to fix the Population Variable so that it is a numeric or double rather than a character value so that my scatter plot will be ordered correctly. And then I spent most of my time trying to find a data set that has Califonia county coordinates on it so I can join that with my water data set, so that I can make an interactive leaflet graph.

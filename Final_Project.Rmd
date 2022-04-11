@@ -36,7 +36,7 @@ Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = 
            sep = "/") 
 ##view(Water_CA)
 Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>% filter(Contaminant == "PFOA")
-(Water_CA)
+#(Water_CA)
 ```
 
 
@@ -85,13 +85,13 @@ Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020, mo
 
 Water_CA <- Water_CA %>% distinct()
 
-view(Water_CA)
+#view(Water_CA)
 
 ```
 
 Having trouble trying ot figure out how to map this data as specific latitude and longitudes are now given. Shoud I try to make a column of coordinates based of off county coordinates? (or I mean I probably cannot just add another column to a data set, so I may need to talk to you about that)
 
-Graph Showing Overall Concentrations Drawn in Each County During the Month of January in 2020.
+Working Lollipop Graph Showing Overall Concentrations Drawn in Each County During the Month of January in 2020.
 ```{r}
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
@@ -104,16 +104,19 @@ Water_remove <- Water_AVG[-c(3), ]
 
 #view(Water_remove)
 
+Water_remove <- Water_remove %>% select(County, Concentration_Total) %>%
+  arrange(Concentration_Total) %>% mutate(County = factor(County, levels = .$County)) 
+
 ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
-  geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) + geom_text(aes(label = Concentration_Total), hjust = -1) + 
   coord_flip() +
   labs(x = "County Name", 
        y = "Average Concentrations of PFOA(NG/L) Drawn from Each County in January 2020")
 
 ```
-Just need to figure out how to arrange them in descending order)
 
+Working Lollipop Graph of Populations of Each County During the Month of January in 2020.
 ```{r}
 Water_parse <- Water_CA %>% rename(Population_Served = `Population Served`) %>% mutate(Population_Served = parse_number(Population_Served)) 
 
@@ -123,17 +126,18 @@ Water_parse <- Water_parse[-c(93, 114), ]
 
 Water_Parse <- Water_parse %>% group_by(County) %>% summarise(Population_AVG = mean(Population_Served)) %>% arrange(desc(Population_AVG))
 
-
-ggplot(data = Water_Parse, aes(x = County, y = Population_AVG)) +
+ Water_Parse <- Water_Parse %>% select(County, Population_AVG) %>%
+  arrange(Population_AVG) %>% mutate(County = factor(County, levels = .$County)) 
+  ggplot(data = Water_Parse, aes(x = County, y = Population_AVG)) +
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
-  geom_segment(aes(x = County, xend = County, y = 0, yend = Population_AVG)) +
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Population_AVG)) + geom_text(aes(label = Population_AVG), hjust = -1) +
   coord_flip() +
   labs(x = "County Name", 
        y = "Population Each County Included in California in January 2020")
 ```
 
 
-Scatterplot of Data (this needs adjusting)
+Scatterplot of Data (this needs adjusting) ### NOT USING IGNORE
 ```{r}
 Water_rename <- Water_remove %>% rename(Population_Served = `Population Served`)
 
@@ -149,7 +153,7 @@ ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served)) +
 library(usmap)
 library(ggplot2)
 
-view(Water_CA)
+#view(Water_CA)
 
 Water_Plot <- Water_CA %>% separate(col = County, into = c("County", "State"), 
            sep = ",") 
@@ -183,7 +187,6 @@ plot_usmap(data = Water_CA, values = "Concentration_Total", include = c("CA"), c
 
 ```
 
-Lost 329 rows of population data after making the data numeric, why?
 
 -scatter plot by average(hover that and it tells county name)
 -plotly
@@ -192,11 +195,11 @@ Lost 329 rows of population data after making the data numeric, why?
 ```{r}
 Water_rename$Population_Served = as.character(Water_rename$Population_Served)
 
-view(Water_rename)
+Water_rename
 
 Water_pop <- Water_rename %>% mutate(Population_lower = Population_Served/1000)
 
-view(Water_pop)
+#view(Water_pop)
 
 plot1 <- ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served,
                                    color = County,      
@@ -205,7 +208,17 @@ plot1 <- ggplot(data = Water_rename, aes(x = Concentration, y = Population_Serve
 
 ggplotly(plot1, tooltip = "label")
 
-view(Water_rename)
+#view(Water_rename)
 ```
 
-Trying to make population lower and inorder
+Trying to make population in order
+
+Trying to make interactive map(using leaflet)
+```{r}
+leaflet() %>% addProviderTiles('CartoDB') %>%
+setView(lng = -119.4179, lat = 36.7783, zoom = 4.5)
+
+
+```
+
+I am still looking for a dataset to join with my water data set that has California state counties as that took up the majority of my time.
