@@ -91,7 +91,7 @@ Water_CA <- Water_CA %>% distinct()
 
 Having trouble trying ot figure out how to map this data as specific latitude and longitudes are now given. Shoud I try to make a column of coordinates based of off county coordinates? (or I mean I probably cannot just add another column to a data set, so I may need to talk to you about that)
 
-Working Lollipop Graph Showing Overall Concentrations Drawn in Each County During the Month of January in 2020.
+Working Lollipop Graph Showing Average Concentrations Drawn in Each County During the Month of January in 2020.
 ```{r}
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
@@ -222,3 +222,32 @@ setView(lng = -119.4179, lat = 36.7783, zoom = 4.5)
 ```
 
 I am still looking for a dataset to join with my water data set that has California state counties as that took up the majority of my time.
+
+Yay! Finally found a data sate to join with my water one that contains U.S. county zipcodes. This did take about an hour and a half to find, so it took up the majority of my work time. 
+```{r}
+url <- "https://en.wikipedia.org/wiki/User:Michael_J/County_table"
+
+library(tidyverse)
+library(rvest)
+
+h <- read_html(url)
+
+tab <- h %>% html_nodes("table")
+
+tab
+county_coord <- tab[[1]] %>% html_table(fill = TRUE)
+
+county_coord <- county_coord %>% rename(County = `County [2]`)
+county_coord <- county_coord %>% filter(State == "CA")
+
+view(county_coord)
+
+Water_remove <-  Water_remove %>% separate(col = County, into = c("County", "State"), 
+           sep = ",") 
+
+Water_County <- full_join(Water_remove,county_coord, by = c("County" = "County"))
+
+view(Water_County)
+```
+
+Have them joined but need to figure out how to change the row names of the counties so that they are not all in upper case. Once they are joined fully,I will be able to make my interactive leaflet map which will be my main data visualization for my blog.
