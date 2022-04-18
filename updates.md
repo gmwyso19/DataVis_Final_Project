@@ -41,3 +41,7 @@ Over the weekend I was finally able to figure out how to order the bars in my lo
 ## April 18 Beginning of Class
 
 I know it really does not look like a did much over the weekend but I promise you I did work on the project for 3 hours. I had a lot of trouble trying to figure out how to rename rows in a column. I had to change the names of the counties in my new data set to all caps so that it would match my water data set when I did a full_join(). After about 2 hours of researching and coding, I finally figure out how to do that with the toupper() function. Then once I figured that out, I tried to rerun my full_join() and I came across this error "Error in UseMethod("full_join") : no applicable method for 'full_join' applied to an object of class "character""." No matter my efforts with joining I kept getting this error. Once I figure out how to fix this error, I will be able to make my leaflet graph and work on my blog. Again, I apologize that it looks as though I did not work on the project, but I can promise you I did and it really frustrated me that I only got this far, as I was planning on making my leaftlet graph over the weekend.
+
+## April 18 End of Class
+
+In class today I was able to successfully join my data sets together and start my leaflet graph. I was having some trouble with that so I decided to work on tidying up my lollipop graphs, which Patrick suggested to me, by making the labels interactive, and I will also be rounding the populations to the nearest person as that seems to make more sense.

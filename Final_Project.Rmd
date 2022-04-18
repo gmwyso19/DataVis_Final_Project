@@ -107,12 +107,14 @@ Water_remove <- Water_AVG[-c(3), ]
 Water_remove <- Water_remove %>% select(County, Concentration_Total) %>%
   arrange(Concentration_Total) %>% mutate(County = factor(County, levels = .$County)) 
 
-ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
+plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
-  geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) + geom_text(aes(label = Concentration_Total), hjust = -1) + 
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Total)) +
   coord_flip() +
   labs(x = "County Name", 
        y = "Average Concentrations of PFOA(NG/L) Drawn from Each County in January 2020")
+
+ ggplotly(plot3, tooltip = "Concentration_Total")
 
 ```
 
@@ -128,25 +130,25 @@ Water_Parse <- Water_parse %>% group_by(County) %>% summarise(Population_AVG = m
 
  Water_Parse <- Water_Parse %>% select(County, Population_AVG) %>%
   arrange(Population_AVG) %>% mutate(County = factor(County, levels = .$County)) 
-  ggplot(data = Water_Parse, aes(x = County, y = Population_AVG)) +
+
+  plot2 <- ggplot(data = Water_Parse, aes(x = County, y = Population_AVG)) +
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
-  geom_segment(aes(x = County, xend = County, y = 0, yend = Population_AVG)) + geom_text(aes(label = Population_AVG), hjust = -1) +
-  coord_flip() +
+  geom_segment(aes(x = County, xend = County, y = 0, yend = Population_AVG)) + coord_flip() +
   labs(x = "County Name", 
        y = "Population Each County Included in California in January 2020")
+  
+  ggplotly(plot2, tooltip = "Population_AVG")
+
 ```
 
+Make a table to compare these rankings to try and make a point about is population size has a correlation with PFOA contamination concentration amounts.
 
-Scatterplot of Data (this needs adjusting) ### NOT USING IGNORE
+Scatterplot of Data (comparing average concetrations per population
+
 ```{r}
-Water_rename <- Water_remove %>% rename(Population_Served = `Population Served`)
-
-view(Water_fix)
-Water_CA$Concentration = as.numeric(Water_CA$Concentration)
-
-ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served)) +
-  geom_point() + facet_wrap( ~ County)
+full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
 ```
+
 
 
 ```{r}
@@ -211,17 +213,6 @@ ggplotly(plot1, tooltip = "label")
 #view(Water_rename)
 ```
 
-Trying to make population in order
-
-Trying to make interactive map(using leaflet)
-```{r}
-leaflet() %>% addProviderTiles('CartoDB') %>%
-setView(lng = -119.4179, lat = 36.7783, zoom = 4.5)
-
-
-```
-
-I am still looking for a dataset to join with my water data set that has California state counties as that took up the majority of my time.
 
 Yay! Finally found a data sate to join with my water one that contains U.S. county zipcodes. This did take about an hour and a half to find, so it took up the majority of my work time. 
 ```{r}
@@ -240,24 +231,41 @@ county_coord <- tab[[1]] %>% html_table(fill = TRUE)
 county_coord <- county_coord %>% rename(County = `County [2]`)
 county_coord <- county_coord %>% filter(State == "CA")
 
-view(county_coord)
+#view(county_coord)
+
+#view(Water_remove)
 
 Water_remove <-  Water_remove %>% separate(col = County, into = c("County", "State"), 
            sep = ",")
+
+view(Water_remove)
 ```
 
-Changing Row Names of Counties
+Changing Row Names of Counties and Joining data sets
 ```{r}
 county_coord$County = toupper(county_coord$County)
-
 county_coord
-```
+Water_remove
 
-```{r}
+Water_coord <- full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
 
-full_join(Water_remove,county_coord, by = c("County" = "County"))
+view(Water_coord)
 
-view(Water_County)
 ```
 
 Have them joined but need to figure out how to change the row names of the counties so that they are not all in upper case. Once they are joined fully,I will be able to make my interactive leaflet map which will be my main data visualization for my blog.
+
+Interactive Leaflet Map of California
+Trying to make interactive map(using leaflet)
+
+```{r}
+leaflet(data = Water_coord) %>% addProviderTiles('CartoDB') %>%
+setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% 
+  addProviderTiles(lng = ~Longitude,
+                   lat = ~Latitude,
+                   label = ~County) %>% 
+  addMarkers(lng = Water_coord$Longitude, lat = Water_coord$Latitude,
+             clusterOptions = markerClusterOptions(),
+             popup = content$popup)
+
+```

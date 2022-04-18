@@ -17,3 +17,7 @@
 ## April 6
 
 ## Patrick is making an interactive shiny app of Mario Cart statistics. In his app you will be able to select certain character and carts and see which combos are the best for different marios cart courses. Right now he is struggling to get the graph in his app to run, because his r studio session seems to terminate everytime he runs the app. 
+
+## April 18 
+
+## I was with Patrick again this week. He is still working on his interactive shiny app of Mario Cart statistics. Right now he has made graph and tables, which were working but are not now so he is trying figure that out. He is also trying to make another visualiazation that when you select certain perameters, it will tell you chich parameters would be best for what you want. So say you want a bike that is medium class, the table would then should you what combinations of drivers, courses and levels would give you the greatest chance to won the race. 
