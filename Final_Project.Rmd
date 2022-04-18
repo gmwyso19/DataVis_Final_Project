@@ -243,9 +243,19 @@ county_coord <- county_coord %>% filter(State == "CA")
 view(county_coord)
 
 Water_remove <-  Water_remove %>% separate(col = County, into = c("County", "State"), 
-           sep = ",") 
+           sep = ",")
+```
 
-Water_County <- full_join(Water_remove,county_coord, by = c("County" = "County"))
+Changing Row Names of Counties
+```{r}
+county_coord$County = toupper(county_coord$County)
+
+county_coord
+```
+
+```{r}
+
+full_join(Water_remove,county_coord, by = c("County" = "County"))
 
 view(Water_County)
 ```
