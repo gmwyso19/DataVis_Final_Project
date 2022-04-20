@@ -49,3 +49,7 @@ In class today I was able to successfully join my data sets together and start m
 ## April 20 Beginning of Class
 
 Between Monday and Wednesday, I worked on creating some leaflet maps. Using both leaflet and plotly. They both did not run the way I intended them and need some more work, which hopefully I can accomplish in class today. But before I was able to do that I had to change the Longitude and Latitude variables from characters to numerics. I did so initially with the as.numeric function, and realized that was a mistake, and went back and renamed the data set and used the parse_numbers() function.
+
+## April 20 End of Class
+
+During class today I focused on trying different ways to make maps. Although most of them did not run correctly, It was helpful to see multiple ways that I could create the maps I have in mind. Hopefully this weekend I will be able to finalize a map.

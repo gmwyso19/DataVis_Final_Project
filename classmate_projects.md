@@ -20,4 +20,8 @@
 
 ## April 18 
 
-## I was with Patrick again this week. He is still working on his interactive shiny app of Mario Cart statistics. Right now he has made graph and tables, which were working but are not now so he is trying figure that out. He is also trying to make another visualiazation that when you select certain perameters, it will tell you chich parameters would be best for what you want. So say you want a bike that is medium class, the table would then should you what combinations of drivers, courses and levels would give you the greatest chance to won the race. 
+## I was with Patrick again this week. He is still working on his interactive shiny app of Mario Cart statistics. Right now he has made graph and tables, which were working but are not now so he is trying figure that out. He is also trying to make another visualiazation that when you select certain perameters, it will tell you chich parameters would be best for what you want. So say you want a bike that is medium class, the table would then should you what combinations of drivers, courses and levels would give you the greatest chance to won the race.
+
+## April 20
+
+## I was with Alex today. He is worikng on a Shiny app that compares NFL quaterback stattistics over the last 20 year. It allows users to pick different characteristics to show which quarterback was best in that category. He is having trouble with labling his lollipop graphs and getting certain parts of the app to run.

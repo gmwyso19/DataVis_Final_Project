@@ -282,7 +282,7 @@ Water_coord2 <- Water_coord2 %>% mutate(Longitude = parse_number(Longitude))
 
 
 Water_coord2 <- Water_coord2 %>% slice(1:21)
-view(Water_coord2)
+#view(Water_coord2)
 
 leaflet(data = Water_coord2) %>% addProviderTiles('CartoDB') %>%
 setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addMarkers(lng = ~Longitude,
@@ -290,3 +290,63 @@ setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addMarker
                                                                                   label = ~County)
 
 ```
+
+```{r}
+library(urbnmapr)
+Water_coord2 %>% ggplot(mapping = aes(-Longitude, Latitude, fill = Concentration_Total)) +
+  geom_polygon(color = "#ffffff", size = .25) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme(legend.title = element_text(),
+        legend.key.width = unit(.5, "in")) +
+  labs(fill = "PFOA Average Concentration") +
+  theme_urban_map()
+```
+
+Well that didn't work
+```{r}
+ggplot(data = Water_coord2, aes(x = Longitude, y = Latitude)) +
+  geom_polygon(colour = "black", aes(fill = Concentration_Total)) +
+  coord_map(projection = "albers", lat0 = 36.7783, lat1 = -119.4179) +
+  theme_void() +
+  scale_fill_viridis_b()
+
+```
+
+```{r}
+library(plotly)
+
+Water_coord2 <- Water_coord2 %>% rename(Population = `Population(2010)`)
+
+Water_coord2
+
+Water_coord2$hover <- with(Water_coord2, paste(County, '<br>', "Population", Population, "Average PFAO Concentration", Concentration_Total, "<br>"))
+# give state boundaries a white border
+l <- list(color = toRGB("white"), width = 2)
+# specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+fig <- plot_geo(Water_coord2, locationmode = 'USA-states')
+fig <- fig %>% add_trace(
+    z = ~Concentration_Total, text = ~hover, locations = ~code,
+    color = ~Concentration_Total, colors = 'Blues'
+  )
+fig <- fig %>% colorbar(title = "PFOA Water Concentrations")
+fig <- fig %>% layout(
+    title = 'California County Average PFOA Contamination Concentrations in January of 2020',
+    geo = g
+  )
+
+fig
+```
+
+```{r}
+leaflet(Water_coord2) %>% 
+  addTiles %>%
+  addPolygons()
+```
+
