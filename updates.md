@@ -45,3 +45,7 @@ I know it really does not look like a did much over the weekend but I promise yo
 ## April 18 End of Class
 
 In class today I was able to successfully join my data sets together and start my leaflet graph. I was having some trouble with that so I decided to work on tidying up my lollipop graphs, which Patrick suggested to me, by making the labels interactive, and I will also be rounding the populations to the nearest person as that seems to make more sense.
+
+## April 20 Beginning of Class
+
+Between Monday and Wednesday, I worked on creating some leaflet maps. Using both leaflet and plotly. They both did not run the way I intended them and need some more work, which hopefully I can accomplish in class today. But before I was able to do that I had to change the Longitude and Latitude variables from characters to numerics. I did so initially with the as.numeric function, and realized that was a mistake, and went back and renamed the data set and used the parse_numbers() function.

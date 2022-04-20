@@ -146,7 +146,7 @@ Make a table to compare these rankings to try and make a point about is populati
 Scatterplot of Data (comparing average concetrations per population
 
 ```{r}
-full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
+#full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
 ```
 
 
@@ -238,7 +238,7 @@ county_coord <- county_coord %>% filter(State == "CA")
 Water_remove <-  Water_remove %>% separate(col = County, into = c("County", "State"), 
            sep = ",")
 
-view(Water_remove)
+Water_remove
 ```
 
 Changing Row Names of Counties and Joining data sets
@@ -247,11 +247,24 @@ county_coord$County = toupper(county_coord$County)
 county_coord
 Water_remove
 
-Water_coord <- full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
+Water_coord2 <- full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
 
-view(Water_coord)
+view(Water_coord2)
 
 ```
+
+```{r}
+library(plotly)
+library(dplyr)
+Water_remove
+plot_geo(Water_remove,
+         locationmode = 'USA-counties') %>% 
+  add_trace(location = ~State,
+            z = ~Concentration_Total,
+            color = ~Concentration_Total) %>% 
+  layout(geo = list(scope = 'usa'))
+```
+
 
 Have them joined but need to figure out how to change the row names of the counties so that they are not all in upper case. Once they are joined fully,I will be able to make my interactive leaflet map which will be my main data visualization for my blog.
 
@@ -259,13 +272,21 @@ Interactive Leaflet Map of California
 Trying to make interactive map(using leaflet)
 
 ```{r}
-leaflet(data = Water_coord) %>% addProviderTiles('CartoDB') %>%
-setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% 
-  addProviderTiles(lng = ~Longitude,
-                   lat = ~Latitude,
-                   label = ~County) %>% 
-  addMarkers(lng = Water_coord$Longitude, lat = Water_coord$Latitude,
-             clusterOptions = markerClusterOptions(),
-             popup = content$popup)
+library(ggplot2)
+library(leaflet)
+library(dplyr)
+
+Water_coord
+Water_coord2 <- Water_coord2 %>% mutate(Latitude = parse_number(Latitude)) 
+Water_coord2 <- Water_coord2 %>% mutate(Longitude = parse_number(Longitude)) 
+
+
+Water_coord2 <- Water_coord2 %>% slice(1:21)
+view(Water_coord2)
+
+leaflet(data = Water_coord2) %>% addProviderTiles('CartoDB') %>%
+setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addMarkers(lng = ~Longitude,
+                                                                                  lat = ~ Latitude,
+                                                                                  label = ~County)
 
 ```
