@@ -25,3 +25,7 @@
 ## April 20
 
 ## I was with Alex today. He is worikng on a Shiny app that compares NFL quaterback stattistics over the last 20 year. It allows users to pick different characteristics to show which quarterback was best in that category. He is having trouble with labling his lollipop graphs and getting certain parts of the app to run.
+
+## April 25 
+
+## I was with Trent today. He is working on a Shiny app that compares statistics of professional soccer players. He has lots of cool graphics! The only trouble he is having now is trying to link his data in the app for viewer to see.

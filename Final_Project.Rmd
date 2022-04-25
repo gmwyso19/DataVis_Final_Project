@@ -62,7 +62,7 @@ plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
   labs(x = "County Name", 
        y = "Average Concentrations of PFOA(NG/L) Drawn from Each County in January 2020")
 
- ggplotly(plot3, tooltip = "Concentration_Total")
+ ggplotly(plot3, tooltip = c("County", "Concentration_Total")
 
 ```
 
@@ -116,14 +116,14 @@ Make a table to compare these rankings to try and make a point about is populati
 ```{r}
 Water_parse <- Water_CA %>% rename(Population_Served = `Population Served`) %>% mutate(Population_Served = parse_number(Population_Served))
 
-Water_parse
+Water_parse %>% group_by(County)
 
-Water_pop <- Water_parse %>% group_by(County, Concentration) %>% summarise(Population_lower = mean(Population_Served)) %>% arrange(desc(Population_lower)) %>% mutate(Population_lower = Population_Served/1000) %>% ungroup()
+Water_pop <- Water_parse %>% group_by(County) %>% summarise(Population_avg = mean(Population_Served)) %>% arrange(desc(Population_avg)) %>% mutate(Population_lower = Population_avg/1000) %>% ungroup()
 
-Water_con <- Water_parse %>% group_by(County) %>% summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total))
+Water_con <- Water_pop %>% group_by(County, Concentration, Population_lower) %>% summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total)) 
 
 
-view(Water_con)
+view(Water_pop)
 
 plot1 <- ggplot(data = Water_pop, aes(x = Concentration, y = Population_lower,
                                    color = County,      

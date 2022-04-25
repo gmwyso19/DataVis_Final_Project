@@ -56,6 +56,10 @@ During class today I focused on trying different ways to make maps. Although mos
 
 ## April 25 Beginning of Class 
 
-Over the weekend I focused most on putting together my blog and teaching myslef how to use the blogdown function through the website you linked in the final project assignment and Youtube. I am still having some trouble with getting the index.rmd to show up on the website. I also worked on sorting through my work so far and getting rid of unnessesary code, and trying to get my scatter plot to work correctly. I am so close with the scatterplot, just need to average the populations and concentrations so that there is only one point per county. 
+Over the weekend I focused most on putting together my blog and teaching myself how to use the blogdown function through the website you linked in the final project assignment and Youtube. I am still having some trouble with getting the index.rmd to show up on the website. I also worked on sorting through my work so far and getting rid of unnessesary code, and trying to get my scatter plot to work correctly. I am so close with the scatterplot, just need to average the populations and concentrations so that there is only one point per county. 
 
-I am not sure how to submit my blog to you since I do not have it linked to my GitHub yet. I can maybe send you a link to the website vis email?
+I am not sure how to submit my blog to you since I do not have it linked to my GitHub yet. I can maybe send you a link to the website via email?
+
+## April 25 End of Class
+
+I spent most of class meeting with Professor Higham and other classmates doing a blog for our final project trying to set up GitHub on Blogdown project and the talking with Trent about our projects. I then worked on trying to fix my scatter-plot and trying to move code from this project file to my new blog project file. 
