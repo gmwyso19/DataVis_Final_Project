@@ -39,58 +39,6 @@ Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>
 #(Water_CA)
 ```
 
-
-```{r}
-
-#install.packages("usmap")
-library(usmap) 
-library(ggplot2) 
-
-plot_usmap(regions = "counties") + 
-  theme(panel.background=element_blank())
-
-plot_usmap(include = c("CA")) +
-  labs(title = "California Mapping") +
-  theme(panel.background = element_rect(color = "black"))
-
-plot_usmap(data = Water_CA, values = "Concentration", include = c("CA"), color = "blue") + 
-  scale_fill_continuous(low = "white", high = "blue", name = "PFOA Concentration", label = scales::comma) + 
-  labs(title = "California PFOA Mapping", subtitle = "Concentration of PFOA Water Contamination for California Counties in 2020") +
-  theme(legend.position = "right")
-
-```
-
-
-What I learned I actually want to do for this project while working on it 3/27/2022:
-
-- For what I want to accomplish in this project, I need to make an interactive map through leaflet rather than ggplot2. This way I can have users hover over a specific county in California and see the concentration of PFOA for various dates over the year. 
-
-
-Playing around with leaflet code from  https://rstudio.github.io/leaflet/choropleths.html to see if I can get it to match up with what I am trying to accomplish. I know it doesn't look like much progress but I have been working all class to try to figure out how to use leaflet to make the graph, as I am having trouble understanding leaflet. Hopefully by next class I will have a leaflet graph made so I can start focusing on additional graphics for my blog, and start to add my work to my blog.
-
-
-Work From 4/2 (Weekend)
-
-```{r}
-library(leaflet)
-library(sp)
-
-Drinking_Water <- read_csv("~/Desktop/Drinking_Water_Testing_Data_State_01-03-2022_0.csv")
-
-Water_CA <- Drinking_Water %>% group_by(State) %>% filter(State =="CA")
-Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = Sample_Date, into = c("month", "day", "year"), 
-           sep = "/") 
-##view(Water_CA)
-Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020, month == 1) %>% filter(Contaminant == "PFOA")
-
-Water_CA <- Water_CA %>% distinct()
-
-#view(Water_CA)
-
-```
-
-Having trouble trying ot figure out how to map this data as specific latitude and longitudes are now given. Shoud I try to make a column of coordinates based of off county coordinates? (or I mean I probably cannot just add another column to a data set, so I may need to talk to you about that)
-
 Working Lollipop Graph Showing Average Concentrations Drawn in Each County During the Month of January in 2020.
 ```{r}
 Water_CA$Concentration = as.numeric(Water_CA$Concentration)
@@ -141,33 +89,6 @@ Water_Parse <- Water_parse %>% group_by(County) %>% summarise(Population_AVG = m
 
 ```
 
-Make a table to compare these rankings to try and make a point about is population size has a correlation with PFOA contamination concentration amounts.
-
-Scatterplot of Data (comparing average concetrations per population
-
-```{r}
-#full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
-```
-
-
-
-```{r}
-library(usmap)
-library(ggplot2)
-
-#view(Water_CA)
-
-Water_Plot <- Water_CA %>% separate(col = County, into = c("County", "State"), 
-           sep = ",") 
-#view(Water_Plot)
-
-plot_usmap(data = Water_Plot, values = "State", color = "Concentration_Total") + 
-  scale_fill_continuous(
-    low = "white", high = "red", name = "PFOA Concentration (2020)", label = scales::comma
-  ) + theme(legend.position = "right")
-  theme(panel.background = element_rect(color = "black", fill = "lightblue"))
-```
-
 
 ```{r}
 
@@ -190,20 +111,21 @@ plot_usmap(data = Water_CA, values = "Concentration_Total", include = c("CA"), c
 ```
 
 
--scatter plot by average(hover that and it tells county name)
--plotly
--maps package in ggplot2
 
+Make a table to compare these rankings to try and make a point about is population size has a correlation with PFOA contamination concentration amounts.
 ```{r}
-Water_rename$Population_Served = as.character(Water_rename$Population_Served)
+Water_parse <- Water_CA %>% rename(Population_Served = `Population Served`) %>% mutate(Population_Served = parse_number(Population_Served))
 
-Water_rename
+Water_parse
 
-Water_pop <- Water_rename %>% mutate(Population_lower = Population_Served/1000)
+Water_pop <- Water_parse %>% group_by(County, Concentration) %>% summarise(Population_lower = mean(Population_Served)) %>% arrange(desc(Population_lower)) %>% mutate(Population_lower = Population_Served/1000) %>% ungroup()
 
-#view(Water_pop)
+Water_con <- Water_parse %>% group_by(County) %>% summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total))
 
-plot1 <- ggplot(data = Water_rename, aes(x = Concentration, y = Population_Served,
+
+view(Water_con)
+
+plot1 <- ggplot(data = Water_pop, aes(x = Concentration, y = Population_lower,
                                    color = County,      
                                    label = County)) +
   geom_point()

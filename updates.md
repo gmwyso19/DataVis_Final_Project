@@ -53,3 +53,9 @@ Between Monday and Wednesday, I worked on creating some leaflet maps. Using both
 ## April 20 End of Class
 
 During class today I focused on trying different ways to make maps. Although most of them did not run correctly, It was helpful to see multiple ways that I could create the maps I have in mind. Hopefully this weekend I will be able to finalize a map.
+
+## April 25 Beginning of Class 
+
+Over the weekend I focused most on putting together my blog and teaching myslef how to use the blogdown function through the website you linked in the final project assignment and Youtube. I am still having some trouble with getting the index.rmd to show up on the website. I also worked on sorting through my work so far and getting rid of unnessesary code, and trying to get my scatter plot to work correctly. I am so close with the scatterplot, just need to average the populations and concentrations so that there is only one point per county. 
+
+I am not sure how to submit my blog to you since I do not have it linked to my GitHub yet. I can maybe send you a link to the website vis email?
