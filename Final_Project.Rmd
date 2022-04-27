@@ -43,15 +43,18 @@ Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>
 Working Lollipop Graph Showing Average Concentrations Drawn in Each County During the Month of January in 2020.
 ```{r}
 
-Water_AVG <- Water_CA %>% ungroup() %>% group_by(County) %>% summarise(Concentration_Total = mean(Concentration)) %>% filter(Concentration_Total > 2) %>% arrange(desc(Concentration_Total)) 
+Water_CA <- Water_CA %>% mutate(Concentration = parse_number(Concentration)) 
 
+Water_AVG <- Water_CA %>% ungroup() %>% group_by(County) %>% summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total)) 
+
+Water_AVG <- Water_AVG %>% filter(Concentration_Total > 2)
 #view(Water_AVG)
 
 Water_remove <- Water_AVG[-c(16), ]
 
 #view(Water_remove)
 
-Water_facter <- Water_remove %>% select(County) %>%
+Water_remove <- Water_remove %>% select(County, Concentration_Total) %>%
   arrange(Concentration_Total) %>% mutate(County = factor(County, levels = .$County)) 
 
 plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
@@ -61,10 +64,9 @@ plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
   labs(x = "County Name", 
        y = "Average Concentrations of PFOA(NG/L) Drawn from Each County in January 2020")
 
-ggplotly(plot3, tooltip = c("County")
+ggplotly(plot3, tooltip = c("County"))
 
 ```
-WHY IS THIS NOT WORKING NOW!
 
 
 Working Lollipop Graph of Populations of Each County During the Month of January in 2020.
@@ -119,6 +121,7 @@ Make a graph to compare these rankings to try and make a point about is populati
 Water_plot <- full_join(Water_remove, Water_Parse, by = c("County" = "County"))
 
 Water_plot <- Water_plot[-c(33:41), ]
+#view(Water_plot)
 
 plot1 <- ggplot(data = Water_plot, aes(x = Concentration_Total, y = Population_AVG,
                                    color = County,      
@@ -129,7 +132,7 @@ ggplotly(plot1, tooltip = "label")
 
 #view(Water_rename)
 ```
-There does not seem to be a correlation between population size and concentration of PFOA.
+There does not seem to be a correlation between population size and concentration of PFOA. It seems as though that there is an opposite effect in which the counties with the lowest populations of people have the highest concentrations of PFOA.
 
 Yay! Finally found a data sate to join with my water one that contains U.S. county zipcodes. This did take about an hour and a half to find, so it took up the majority of my work time. 
 ```{r}
@@ -155,7 +158,7 @@ county_coord <- county_coord %>% filter(State == "CA")
 Water_remove <-  Water_remove %>% separate(col = County, into = c("County", "State"), 
            sep = ",")
 
-Water_remove
+#Water_remove
 ```
 
 Changing Row Names of Counties and Joining data sets
@@ -166,7 +169,7 @@ Water_remove
 
 Water_coord3 <- full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
 
-view(Water_coord3)
+#view(Water_coord3)
 
 ```
 
@@ -193,54 +196,16 @@ library(ggplot2)
 library(leaflet)
 library(dplyr)
 
-Water_coord2
+Water_coord3 <- Water_coord3 %>% mutate(Longitude = parse_number(Longitude)) 
+Water_coord3 <- Water_coord3 %>% mutate(Latitude = parse_number(Latitude))
 
 Water_coord2 <- Water_coord3 %>% slice(1:21)
-#view(Water_coord2)
-
-leaflet(data = Water_coord2) %>% addProviderTiles('CartoDB') %>%
-setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addMarkers(lng = ~Longitude,
-                                                                                  lat = ~ Latitude,
-                                                                                  label = ~County)
-
-```
-
-
-```{r}
-library(plotly)
-
-Water_coord2 <- Water_coord2 %>% rename(Population = `Population(2010)`)
 
 Water_coord2
 
-Water_coord2$hover <- with(Water_coord2, paste(County, '<br>', "Population", Population, "Average PFAO Concentration", Concentration_Total, "<br>"))
-# give state boundaries a white border
-l <- list(color = toRGB("white"), width = 2)
-# specify some map projection/options
-g <- list(
-  scope = 'usa',
-  projection = list(type = 'albers usa'),
-  showlakes = TRUE,
-  lakecolor = toRGB('white')
-)
+leaflet(data = Water_coord2) %>% addProviderTiles('CartoDB') %>%
+setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addMarkers(lng = County$Longitude,
+                                                                                  lat = County$Latitude)
 
-fig <- plot_geo(Water_coord2, locationmode = 'USA-states')
-fig <- fig %>% add_trace(
-    z = ~Concentration_Total, text = ~hover, locations = ~code,
-    color = ~Concentration_Total, colors = 'Blues'
-  )
-fig <- fig %>% colorbar(title = "PFOA Water Concentrations")
-fig <- fig %>% layout(
-    title = 'California County Average PFOA Contamination Concentrations in January of 2020',
-    geo = g
-  )
-
-fig
-```
-
-```{r}
-leaflet(Water_coord2) %>% 
-  addTiles %>%
-  addPolygons()
 ```
 

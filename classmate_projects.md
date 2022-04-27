@@ -29,3 +29,7 @@
 ## April 25 
 
 ## I was with Trent today. He is working on a Shiny app that compares statistics of professional soccer players. He has lots of cool graphics! The only trouble he is having now is trying to link his data in the app for viewer to see.
+
+## April 27
+
+## I was with Alex again today. He is currently having trouble getting the graphs to run in his shinny app of NFL quarterbacks.

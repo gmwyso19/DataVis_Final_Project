@@ -67,3 +67,7 @@ I spent most of class meeting with Professor Higham and other classmates doing a
 ## April 27 Beginning of Class
 
 I spent a lot of time trying to fix my lollipop graphs because for some reason they were not running. I was able to fix one but now one of them still will not run. I also was able to finally fix my scatterplot! And then I continued working on creating a map of california showing my data.
+
+## April 27 End of Class
+
+I spent part of class meeting with Professor Higham and another classmate doing a blog for our final project and  trying to set up GitHub on Blogdown project. I was able to fix my lollipop graph, which in turn allowed for my scatterplot to run again. And then I was working on creating a leaflet graph.
