@@ -63,3 +63,7 @@ I am not sure how to submit my blog to you since I do not have it linked to my G
 ## April 25 End of Class
 
 I spent most of class meeting with Professor Higham and other classmates doing a blog for our final project trying to set up GitHub on Blogdown project and the talking with Trent about our projects. I then worked on trying to fix my scatter-plot and trying to move code from this project file to my new blog project file. 
+
+## April 27 Beginning of Class
+
+I spent a lot of time trying to fix my lollipop graphs because for some reason they were not running. I was able to fix one but now one of them still will not run. I also was able to finally fix my scatterplot! And then I continued working on creating a map of california showing my data.

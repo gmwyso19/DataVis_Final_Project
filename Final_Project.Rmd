@@ -25,6 +25,7 @@ library(readr)
 library(tidyverse)
 library(sf)
 library(plotly)
+library(ggplot2)
 Drinking_Water <- read_csv("~/Desktop/Drinking_Water_Testing_Data_State_01-03-2022_0.csv")
 #view(Drinking_Water)
 ```
@@ -35,24 +36,22 @@ Water_CA <- Drinking_Water %>% group_by(State) %>% filter(State =="CA")
 Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = Sample_Date, into = c("month", "day", "year"), 
            sep = "/") 
 ##view(Water_CA)
-Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>% filter(Contaminant == "PFOA")
+Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>% filter(Contaminant == "PFOA") 
 #(Water_CA)
 ```
 
 Working Lollipop Graph Showing Average Concentrations Drawn in Each County During the Month of January in 2020.
 ```{r}
-Water_CA$Concentration = as.numeric(Water_CA$Concentration)
 
-
-Water_AVG <- Water_CA%>% ungroup() %>% group_by(County) %>% summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total))
+Water_AVG <- Water_CA %>% ungroup() %>% group_by(County) %>% summarise(Concentration_Total = mean(Concentration)) %>% filter(Concentration_Total > 2) %>% arrange(desc(Concentration_Total)) 
 
 #view(Water_AVG)
 
-Water_remove <- Water_AVG[-c(3), ]
+Water_remove <- Water_AVG[-c(16), ]
 
 #view(Water_remove)
 
-Water_remove <- Water_remove %>% select(County, Concentration_Total) %>%
+Water_facter <- Water_remove %>% select(County) %>%
   arrange(Concentration_Total) %>% mutate(County = factor(County, levels = .$County)) 
 
 plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
@@ -62,15 +61,17 @@ plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
   labs(x = "County Name", 
        y = "Average Concentrations of PFOA(NG/L) Drawn from Each County in January 2020")
 
- ggplotly(plot3, tooltip = c("County", "Concentration_Total")
+ggplotly(plot3, tooltip = c("County")
 
 ```
+WHY IS THIS NOT WORKING NOW!
+
 
 Working Lollipop Graph of Populations of Each County During the Month of January in 2020.
 ```{r}
 Water_parse <- Water_CA %>% rename(Population_Served = `Population Served`) %>% mutate(Population_Served = parse_number(Population_Served)) 
 
-Water_parse <- Water_parse[-c(93, 114), ]
+Water_parse <- Water_parse[-c(41, 127, 173, 174, 205), ]
 
 #view(Water_parse)
 
@@ -112,20 +113,14 @@ plot_usmap(data = Water_CA, values = "Concentration_Total", include = c("CA"), c
 
 
 
-Make a table to compare these rankings to try and make a point about is population size has a correlation with PFOA contamination concentration amounts.
+Make a graph to compare these rankings to try and make a point about is population size has a correlation with PFOA contamination concentration amounts.
 ```{r}
-Water_parse <- Water_CA %>% rename(Population_Served = `Population Served`) %>% mutate(Population_Served = parse_number(Population_Served))
 
-Water_parse %>% group_by(County)
+Water_plot <- full_join(Water_remove, Water_Parse, by = c("County" = "County"))
 
-Water_pop <- Water_parse %>% group_by(County) %>% summarise(Population_avg = mean(Population_Served)) %>% arrange(desc(Population_avg)) %>% mutate(Population_lower = Population_avg/1000) %>% ungroup()
+Water_plot <- Water_plot[-c(33:41), ]
 
-Water_con <- Water_pop %>% group_by(County, Concentration, Population_lower) %>% summarise(Concentration_Total = mean(Concentration)) %>% arrange(desc(Concentration_Total)) 
-
-
-view(Water_pop)
-
-plot1 <- ggplot(data = Water_pop, aes(x = Concentration, y = Population_lower,
+plot1 <- ggplot(data = Water_plot, aes(x = Concentration_Total, y = Population_AVG,
                                    color = County,      
                                    label = County)) +
   geom_point()
@@ -134,7 +129,7 @@ ggplotly(plot1, tooltip = "label")
 
 #view(Water_rename)
 ```
-
+There does not seem to be a correlation between population size and concentration of PFOA.
 
 Yay! Finally found a data sate to join with my water one that contains U.S. county zipcodes. This did take about an hour and a half to find, so it took up the majority of my work time. 
 ```{r}
@@ -169,9 +164,9 @@ county_coord$County = toupper(county_coord$County)
 county_coord
 Water_remove
 
-Water_coord2 <- full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
+Water_coord3 <- full_join(Water_remove, county_coord, by = c("County" = "County"), copy = TRUE)
 
-view(Water_coord2)
+view(Water_coord3)
 
 ```
 
@@ -198,12 +193,9 @@ library(ggplot2)
 library(leaflet)
 library(dplyr)
 
-Water_coord
-Water_coord2 <- Water_coord2 %>% mutate(Latitude = parse_number(Latitude)) 
-Water_coord2 <- Water_coord2 %>% mutate(Longitude = parse_number(Longitude)) 
+Water_coord2
 
-
-Water_coord2 <- Water_coord2 %>% slice(1:21)
+Water_coord2 <- Water_coord3 %>% slice(1:21)
 #view(Water_coord2)
 
 leaflet(data = Water_coord2) %>% addProviderTiles('CartoDB') %>%
@@ -213,26 +205,6 @@ setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addMarker
 
 ```
 
-```{r}
-library(urbnmapr)
-Water_coord2 %>% ggplot(mapping = aes(-Longitude, Latitude, fill = Concentration_Total)) +
-  geom_polygon(color = "#ffffff", size = .25) +
-  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
-  theme(legend.title = element_text(),
-        legend.key.width = unit(.5, "in")) +
-  labs(fill = "PFOA Average Concentration") +
-  theme_urban_map()
-```
-
-Well that didn't work
-```{r}
-ggplot(data = Water_coord2, aes(x = Longitude, y = Latitude)) +
-  geom_polygon(colour = "black", aes(fill = Concentration_Total)) +
-  coord_map(projection = "albers", lat0 = 36.7783, lat1 = -119.4179) +
-  theme_void() +
-  scale_fill_viridis_b()
-
-```
 
 ```{r}
 library(plotly)
