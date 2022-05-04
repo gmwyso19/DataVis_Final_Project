@@ -35,12 +35,12 @@ Tidying the data set to specify it to only include points from California of PFO
 Water_CA <- Drinking_Water %>% group_by(State) %>% filter(State =="CA")
 Water_CA <- Water_CA %>% rename(Sample_Date = `Sample Date`) %>% separate(col = Sample_Date, into = c("month", "day", "year"), 
            sep = "/") 
-##view(Water_CA)
+#View(Water_CA)
 Water_CA <- Water_CA %>% group_by(year, Contaminant) %>% filter(year == 2020) %>% filter(Contaminant == "PFOA") 
 #view(Water_CA)
 ```
 
-Working Lollipop Graph Showing Average Concentrations Drawn in Each County During the Month of January in 2020.
+Working Lollipop Graph Showing Average Concentrations of PFOA Drawn in Each County During the Month of January in 2020.
 ```{r}
 
 Water_CA <- Water_CA %>% mutate(Concentration = parse_number(Concentration)) 
@@ -62,7 +62,7 @@ Water_remove$Concentration_Round <- round(Water_remove$Concentration_Total ,digi
 
 Water_remove
 
-plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Total)) +
+plot3 <- ggplot(data = Water_remove, aes(x = County, y = Concentration_Round)) +
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
   geom_segment(aes(x = County, xend = County, y = 0, yend = Concentration_Round)) +
   coord_flip() +
@@ -74,7 +74,7 @@ ggplotly(plot3, tooltip = c("County", "Concentration_Round"))
 ```
 
 
-Working Lollipop Graph of Populations of Each County During the Month of January in 2020.
+Working Lollipop Graph of Average Population of People Who Consumed this Contaminated Water in Each County During the Month of January in 2020.
 ```{r}
 Water_parse <- Water_CA %>% rename(Population_Served = `Population Served`) %>% mutate(Population_Served = parse_number(Population_Served)) 
 
@@ -95,30 +95,29 @@ Water_Parse$Population_Round <- round(Water_Parse$Population_AVG)
   geom_point(size=3, color="blue", fill=alpha("light blue", 0.3), alpha=0.7, shape=21, stroke=1) + 
   geom_segment(aes(x = County, xend = County, y = 0, yend = Population_AVG)) + coord_flip() +
   labs(x = "County Name", 
-       y = "Population Each County Included in California in January 2020")
+       y = "Population Affected in Each County Included in California in January 2020")
   
 ggplotly(plot2, tooltip = c("County", "Population_Round"))
 
 ```
 
 
-Make a graph to compare these rankings to try and make a point about is population size has a correlation with PFOA contamination concentration amounts.
+Make a graph to compare these rankings to try and make a point about is population served has a correlation with PFOA contamination concentration amounts.
+
 ```{r}
-
 Water_plot <- full_join(Water_remove, Water_Parse, by = c("County" = "County"))
-
 Water_plot <- Water_plot[-c(33:41), ]
 #view(Water_plot)
-
 plot1 <- ggplot(data = Water_plot, aes(x = Concentration_Total, y = Population_AVG,
-                                   color = County,      
-                                   label = County)) +
-  geom_point()
-
-ggplotly(plot1, tooltip = "label")
-
-#view(Water_rename)
+                                   color = County)) +
+  geom_point() + 
+    labs(x = "Concentrations of PFOA(NG/L) Drawn from Each County", 
+       y = "Population Affected in Each County Included")
+  
+ggplotly(plot1, tooltip = c("County", "Population_Round"))
 ```
+
+
 There does not seem to be a correlation between population size and concentration of PFOA. It seems as though that there is an opposite effect in which the counties with the lowest populations of people have the highest concentrations of PFOA. This not an uncommon connection. It if often the small towns that do not have water filtertrations systems mandated by the stat in place, the are most affected by water contamination.
 
 Yay! Finally found a data sate to join with my water one that contains U.S. county zipcodes. This did take about an hour and a half to find, so it took up the majority of my work time. 
@@ -160,18 +159,6 @@ Water_coord3 <- full_join(Water_remove, county_coord, by = c("County" = "County"
 
 ```
 
-```{r}
-library(plotly)
-library(dplyr)
-Water_remove
-plot_geo(Water_remove,
-         locationmode = 'USA-counties') %>% 
-  add_trace(location = ~State,
-            z = ~Concentration_Total,
-            color = ~Concentration_Total) %>% 
-  layout(geo = list(scope = 'usa'))
-```
-
 
 Have them joined but need to figure out how to change the row names of the counties so that they are not all in upper case. Once they are joined fully,I will be able to make my interactive leaflet map which will be my main data visualization for my blog.
 
@@ -186,25 +173,31 @@ library(dplyr)
 Water_coord3 <- Water_coord3 %>% mutate(Longitude = parse_number(Longitude)) 
 Water_coord3 <- Water_coord3 %>% mutate(Latitude = parse_number(Latitude))
 
-Water_coord2 <- Water_coord3 %>% slice(1:21)
+Water_coord2 <- Water_coord3 %>% slice(1:33)
 
-View(Water_coord2)
+#View(Water_coord3)
 
-content <- Water_coord2$County
+Water_coord2$label <- paste("<p>", "County: ", Water_coord2$County, "</p>",
+                            "<p>", "Population: ", Water_coord2$`Population(2010)`, "</p>",
+                            "<p>", "Average PFOA Concentration: ", Water_coord2$Concentration_Round, "</p>")
+#View(Water_coord2)
+
+Water_coord2$color_label <- cut(Water_coord2$Concentration_Round, 
+                        c(0,2,4,10,20,200), include.lowest = T,
+                        labels = c('<2', '2-4', '4-10', '10-20', '20+'))
+color_con <- colorFactor(palette = 'RdYlGn', Water_coord2$color_label)
+
 leaflet(data = Water_coord2)  %>%
-setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addProviderTiles(providers$Wikimedia) %>% addCircleMarkers(lng = Water_coord2$Longitude,
-                                                                                  lat = Water_coord2$Latitude,
-                                                                                  clusterOptions = markerClusterOptions(),
-                                                                                  popup = content
-                                                                            )
-      # label = c("County",
-      #                                                                                       "Population(2010)",
-      #                                                                                       "Contration_Round")
+setView(lng = -119.4179, lat = 36.7783, zoom = 4.5) %>% addTiles() %>% addProviderTiles(providers$Wikimedia) %>% 
+addCircleMarkers(lng = Water_coord2$Longitude*-1,
+                lat = Water_coord2$Latitude,
+                color = ~color_con(color_label),
+                clusterOptions = markerClusterOptions(),
+                popup = as.character(Water_coord2$label)
+                                                                            ) %>%
+  addLegend('bottomleft', pal = color_con, values = Water_coord2$color_label,
+            title = 'AVG Concentrations of PFOA in Water',
+            opacity = 1)
+     
 ```
-
-```{r}
-states <- geojsonio::geojson_read("https://rstudio.github.io/leaflet/json/us-states.geojson", what = "sp")
-class(states)
-```
-
 
